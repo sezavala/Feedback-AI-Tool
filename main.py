@@ -1,15 +1,20 @@
-from typing import Union
-
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from my_extension import MyExtension
 
 app = FastAPI()
 
+# Initialize the extension
+extension = MyExtension(app)
+extension.setup()
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"message": "Hello World"}
 
+@app.get("/error")
+def cause_error():
+    raise HTTPException(status_code=400, detail="An example error")
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
